@@ -306,7 +306,10 @@ export const Status: React.FC = () => {
                             {stat.user.username}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {stat.user.access_key}
+                            {user?.role === 'admin' || stat.user.role !== 'admin' 
+                              ? stat.user.access_key 
+                              : '••••••••••••••••'
+                            }
                           </div>
                         </div>
                       </td>

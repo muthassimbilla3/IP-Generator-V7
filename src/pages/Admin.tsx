@@ -630,7 +630,10 @@ export const Admin: React.FC = () => {
                         />
                       ) : (
                         <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-                          {userData.access_key}
+                          {user?.role === 'admin' || userData.role !== 'admin' 
+                            ? userData.access_key 
+                            : '••••••••••••••••'
+                          }
                         </code>
                       )}
                     </td>
