@@ -181,10 +181,20 @@ export const Status: React.FC = () => {
         <h1 className="text-2xl font-bold text-gray-900 mb-6">System Status</h1>
 
         {/* Quick Limit Setter - Only for Admin and Manager */}
-        {(user?.role === 'admin' || user?.role === 'manager') && (
+        {(user?.role === 'admin' || user?.role === 'manager') && userStats.length > 0 && (
           <div className="mb-6 flex justify-end">
             <QuickLimitSetter 
-              users={userStats.map(stat => stat.user)} 
+              users={userStats
+                .map(stat => stat.user)
+                .filter(userData => {
+                  if (user?.role === 'admin') {
+                    return true; // Admin can manage all users
+                  } else if (user?.role === 'manager') {
+                    return userData.role === 'user'; // Manager can only manage regular users
+                  }
+                  return false;
+                })
+              } 
               onUpdate={fetchUserStats}
               userRole={user.role}
             />

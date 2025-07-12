@@ -22,7 +22,7 @@ const QuickLimitSetter: React.FC<QuickLimitSetterProps> = ({ users, onUpdate, us
     if (userRole === 'admin') {
       return true; // Admin can manage all users
     } else if (userRole === 'manager') {
-      return user.role === 'user'; // Manager can only manage regular users
+      return user.role === 'user' || user.role === 'manager'; // Manager can manage users and other managers
     }
     return false;
   });
@@ -178,6 +178,19 @@ const QuickLimitSetter: React.FC<QuickLimitSetterProps> = ({ users, onUpdate, us
   const presetCooldowns = [0, 1, 2, 3, 6, 12, 24]; // hours
 
   if (filteredUsers.length === 0) {
+    // Show a message instead of hiding completely for managers
+    if (userRole === 'manager') {
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <Users className="w-5 h-5 text-yellow-600 mr-2" />
+            <p className="text-yellow-700 text-sm">
+              কোনো ইউজার পাওয়া যায়নি যাদের লিমিট সেট করা যায়। শুধুমাত্র সাধারণ ইউজারদের লিমিট ম্যানেজ করতে পারবেন।
+            </p>
+          </div>
+        </div>
+      );
+    }
     return null;
   }
 
