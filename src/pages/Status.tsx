@@ -45,6 +45,16 @@ export const Status: React.FC = () => {
 
       if (usersError) throw usersError;
 
+      // Filter users based on current user role
+      const filteredUsers = users?.filter(userData => {
+        if (user?.role === 'admin') {
+          return true; // Admin can see all users
+        } else if (user?.role === 'manager') {
+          return userData.role !== 'admin'; // Manager cannot see admin users
+        }
+        return false;
+      }) || [];
+
       // Fetch all usage logs
       const { data: usageLogs, error: logsError } = await supabase
         .from('usage_logs')
@@ -58,7 +68,7 @@ export const Status: React.FC = () => {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      const stats: UserStats[] = users?.map(userData => {
+      const stats: UserStats[] = filteredUsers.map(userData => {
         const userLogs = usageLogs?.filter(log => log.user_id === userData.id) || [];
         
         const totalUsage = userLogs.reduce((sum, log) => sum + log.amount, 0);
@@ -79,7 +89,7 @@ export const Status: React.FC = () => {
           usageCount,
           lastUsed
         };
-      }) || [];
+      });
 
       setUserStats(stats);
     } catch (error) {
@@ -186,14 +196,6 @@ export const Status: React.FC = () => {
             <QuickLimitSetter 
               users={userStats
                 .map(stat => stat.user)
-                .filter(userData => {
-                  if (user?.role === 'admin') {
-                    return true; // Admin can manage all users
-                  } else if (user?.role === 'manager') {
-                    return userData.role === 'user'; // Manager can only manage regular users
-                  }
-                  return false;
-                })
               } 
               onUpdate={fetchUserStats}
               userRole={user.role}
